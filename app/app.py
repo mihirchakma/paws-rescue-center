@@ -15,7 +15,7 @@ pets = [
 
 """Information regarding the Users in the System."""
 users = [
-    {"id": 1, "full_name":"Pet Rescue Team", "email":"team@pawsrescue.com", "password":"adminpass"},
+    {"id": 1, "full_name":"Pet Rescue Team", "email":"team@pawsrescue.com", "password":"adminpass"}
 ]
 
 @app.route("/")
@@ -42,8 +42,12 @@ def pet_details(pet_id):
 def signup():
     """View function for Showing Details of Each Pet."""
     form = SignUpForm()
+    if form.validate_on_submit():
+        new_user = {"id": len(users)+1, "full_name": form.full_name.data, "email": form.email.data, "password": form.password.data}
+        users.append(new_user)
+        return render_template("signup.html", message = "Successfully signed up")        
     return render_template("signup.html", form = form)
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True, host="0.0.0.0", port=3000)
