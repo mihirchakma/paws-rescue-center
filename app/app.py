@@ -1,6 +1,6 @@
 """Flask Application for Paws Rescue Center."""
 from flask import Flask, render_template, abort
-from forms import SignUpForm
+from forms import SignUpForm, LoginForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'dfewfew123213rwdsgert34tgfd1234trgf'
@@ -48,6 +48,10 @@ def signup():
         return render_template("signup.html", message = "Successfully signed up")    
     return render_template("signup.html", form = form)
 
+@app.route("/login", methods = ["POST", "GET"])
+def login():
+    form = LoginForm()
+    return render_template("login.html", form = form)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=3000)
