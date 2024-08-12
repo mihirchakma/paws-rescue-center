@@ -20,7 +20,7 @@ pip install WTForms
 pip install Flask-WTF
 ```
 
-#### SQLAlchemy
+#### SQLAlchemy (Database)
 
 ```
 pip install SQLAlchemy
