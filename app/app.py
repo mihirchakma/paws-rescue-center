@@ -2,9 +2,29 @@
 from flask import Flask, render_template, abort
 from forms import SignUpForm, LoginForm
 from flask import session, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'dfewfew123213rwdsgert34tgfd1234trgf'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pws.db'
+db = SQLAlchemy(app)
+
+"""Model for Pets."""
+class Pet(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String, unique = True)
+    age = db.Column(db.Integer)
+    bio = db.Column(db.String)
+
+"""Model for Users."""
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    full_name = db.Column(db.String)
+    email = db.Column(db.String, unique = True)
+    password = db.Column(db.String)
+
+db.create_all()
+
 
 """Information regarding the Pets in the System."""
 pets = [
