@@ -12,10 +12,11 @@ Login
 
 {% if message %}
     {{ message }}
+    <br>
 {% endif %}
 
 {% if form %}
-<form action="{{ url_for('login') }}" method="POST" style="padding:5px;">
+<form action="{{url_for('login')}}" method="POST" style="padding:5px;">
 
     <!-- Email Field -->
     {{ form.email.label }}: <br>
@@ -41,6 +42,6 @@ Login
 
     {{ form.csrf_token }}
     {{ form.submit }}
-</form>
+</form> 
 {% endif %}
 {% endblock %}
