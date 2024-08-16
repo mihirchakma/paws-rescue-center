@@ -9,12 +9,11 @@ app.config['SECRET_KEY'] = 'dfewfew123213rwdsgert34tgfd1234trgf'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///paws.db'
 db = SQLAlchemy(app)
 
-
 """Model for Pets."""
 class Pet(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String, unique = True)
-    age = db.Column(db.Integer) # db.String
+    age = db.Column(db.String)
     bio = db.Column(db.String)
     posted_by = db.Column(db.String, db.ForeignKey('user.id'))
 
@@ -28,6 +27,17 @@ class User(db.Model):
 
 db.create_all()
 
+# Create "team" user and add it to session
+team = User(full_name = "Pet Rescue Team", email = "team@petrescue.co", password = "adminpass")
+db.session.add(team)
+
+# Commit changes in the session
+try:
+    db.session.commit()
+except Exception as e: 
+    db.session.rollback()
+finally:
+    db.session.close()
 
 """Information regarding the Pets in the System."""
 pets = [
@@ -36,11 +46,6 @@ pets = [
             {"id": 3, "name": "Basker", "age": "1 year", "bio": "I love barking. But, I love my friends more."},
             {"id": 4, "name": "Mr. Furrkins", "age": "5 years", "bio": "Probably napping."}, 
         ]
-
-"""Information regarding the Users in the System."""
-users = [
-    {"id": 1, "full_name":"Pet Rescue Team", "email":"team@pawsrescue.com", "password":"adminpass"},
-]
 
 
 @app.route("/")
@@ -69,8 +74,18 @@ def signup():
     """View function for Showing Details of Each Pet."""
     form = SignUpForm()
     if form.validate_on_submit():
-        new_user = {"id": len(users)+1, "full_name": form.full_name.data, "email": form.email.data, "password": form.password.data}
-        users.append(new_user)
+        # new_user = {"id": len(users)+1, "full_name": form.full_name.data, "email": form.email.data, "password": form.password.data}
+        # users.append(new_user)
+        new_user = User(full_name = form.full_name.data, email = form.email.data, password = form.password.data)
+        db.session.add(new_user)
+        try:
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return render_template("signup.html", form = form, message = "This Email already exists in the system! Please Log in instead.")
+        finally:
+            db.session.close()
         return render_template("signup.html", message = "Successfully signed up")    
     return render_template("signup.html", form = form)
 
@@ -79,11 +94,13 @@ def signup():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = next((user for user in users if user["email"] == form.email.data and user["password"] == form.password.data), None)
+        # user = next((user for user in users if user["email"] == form.email.data and user["password"] == form.password.data), None)
+        user = User.query.filter_by(email = form.email.data, password = form.password.data).first()
         if user is None:
             return render_template("login.html", form = form, message = "Wrong Credentials. Please Try Again.")
         else:
-            session['user'] = user
+            # session['user'] = user
+            session['user'] = user.id
             return render_template("login.html", message = "Successfully Log In!")
     return render_template("login.html", form = form)
 
